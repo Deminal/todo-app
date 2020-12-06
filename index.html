@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- displays site properly based on user's device -->
+
+  <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png">
+  
+  <title>Frontend Mentor | Todo app</title>
+
+  <!-- Feel free to remove these styles or customise in your own stylesheet 👍 -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;700&display=swap');
+
+    *, *:after, *:before {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+    html {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: .88rem;
+      --heading: hsl(0,0%,98%);
+      --bright-blue: hsl(220, 98%, 61%); /*For active filter?*/
+      --check-bg: linear-gradient(to bottom right, hsl(192, 100%, 67%), hsl(280, 87%, 65%)); /*Check background*/
+    }
+
+    button {
+      font-family: 'Josefin Sans', sans-serif;
+    }
+
+    /* ### Light Theme */
+    .theme-light {
+      --bottom: black;
+      --border: var(--bg);
+      --circle: hsl(233, 11%, 84%);
+      --app-bg: hsl(0, 0%, 98%);
+      --completed-grey: hsl(236, 33%, 92%);
+      --bg: hsl(233, 11%, 84%);
+      --active-grey: hsl(236, 9%, 61%);
+      --active-grey-hover: hsl(235, 19%, 35%);
+      --item-grey: hsl(235, 19%, 35%);
+      --background: url(./images/bg-mobile-light.jpg);
+      --toggle-bg: url(./images/icon-moon.svg);
+    }
+    /* ### Dark Theme */
+    .theme-dark {
+      --bottom: hsl(233, 14%, 35%);
+      --border: rgba(77, 80, 102, .5);
+      --circle: hsl(234, 11%, 52%);
+      --bg: hsl(235, 21%, 11%);
+      --app-bg: hsl(235, 24%, 19%);
+      --item-grey: hsl(234, 39%, 85%);
+      --item-grey-hover: hsl(236, 33%, 92%); /*(hover)*/
+      --active-grey-hover: hsl(234, 11%, 52%);
+      --active-grey: hsl(233, 14%, 35%);
+      --very-dark-grayish-blue: hsl(237, 14%, 26%);
+      --background: url(./images/bg-mobile-dark.jpg);
+      --toggle-bg: url(./images/icon-sun.svg);
+    }
+
+    body {
+      min-width: 375px;
+      max-height: 100vh;
+      /* display: grid; */
+      /* grid-template-rows: calc(166px + 9vh) auto; */
+      /* background: var(--background) top no-repeat; */
+      background-color: var(--bg);
+      /* background-size: 100% 33% ; */
+    }
+
+    .bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 37vh;
+      background: var(--background) center left no-repeat;
+      background-size: cover;
+      transition: background-image 1s ease-in-out;
+      z-index: -1;
+    }
+
+    main {
+      width: 89vw;
+      min-width: 375px;
+      max-width: 799px;
+      /* min-width: 375px;
+      width: 73vw;
+      max-width: 770px; */
+      min-height: 66vh;
+      margin: 11vh auto 1.66rem;
+      padding: 0 3vw;
+      display: flex;
+      flex-flow: column nowrap;
+      align-items: center;
+    }
+
+    main .header {
+      width: 100%;
+      color: var(--heading);
+      font-size: calc(.89rem + 1vw);
+      letter-spacing: 1.33rem;
+      display: flex;
+      justify-content: space-between;
+      align-content: baseline;
+      padding: 0 0 2.66rem;
+    }
+
+    .header h2 {
+      text-transform: uppercase;
+      text-justify: center;
+    }
+
+    button#toggler {
+      background: var(--toggle-bg) no-repeat right top;
+      background-size: contain;
+      height: calc(1.66rem + 1vw);
+      width: calc(1.66rem + 1vw);
+      outline: none;
+      border: none;
+      opacity: .9;
+      cursor: pointer;
+    }
+
+    #toggler:hover, #toggler:active {
+      opacity: 1;
+    }
+
+    section.app {
+      width: 100%;
+      flex: 1 0 80%;
+      display: flex;
+      flex-flow: column nowrap;
+      margin-bottom: 2.66rem;
+    }
+
+    .circle {
+      background: transparent;
+      flex: 0 0 auto;
+      height: calc(33px + 1vw);
+      max-height: 43px;
+      width: calc(33px + 1vw);
+      max-width: 43px;
+      border-radius: 50%;
+      border: 1px solid var(--circle);
+      opacity: .8;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .item.completed .circle {
+      background: url(./images/icon-check.svg) no-repeat center center, var(--check-bg);
+      background-size: 75%, cover;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .item.active .circle:hover, .add-item .circle:hover {
+      opacity: 1;
+      background: var(--check-bg);
+    }
+
+    .item.completed .circle:hover {
+      opacity: 1;
+    }
+    /* .add-item .circle {
+      height: 37px;
+      width: 37px;
+      border-radius: 50%;
+      border: 1px solid var(--circle);
+      opacity: .6;
+    } */
+    #add {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: .88rem;
+      background-color: var(--app-bg);
+      width: 100%;
+      height: 100%;
+      outline: none;
+      border: none;
+      color: var(--item-grey);
+    }
+
+    #add::placeholder {
+      color: var(--active-grey);
+      font-family: 'Josefin Sans', sans-serif;
+      /* font-size: 1rem; */
+    }
+
+    .add-item, .item, .control > * {
+      display: flex;
+      background-color: var(--app-bg);
+      gap: 1.33rem;
+      padding: 1.125rem 1.33rem;
+      align-items: center;
+    }
+
+    .add-item {
+      border-radius: 15px;
+      margin-bottom: 2.33rem;
+    }
+
+    section.app #items {
+      display: flex;
+      flex-flow: column nowrap;
+    }
+
+    .item {
+      border-bottom: solid 1px var(--border);
+      cursor: pointer;
+    }
+
+    .item:first-of-type {
+      border-radius: 15px 15px 0 0;
+    }
+
+    .item span {
+      width: 99%;
+      color: var(--item-grey);
+    }
+
+    .delete {
+      flex: 0 0 auto;
+      background: url(./images/icon-cross.svg) no-repeat center center;
+      background-size: 50%;
+      width: calc(44px + 1vw);
+      max-width: 51px;
+      height: calc(44px + 1vw);
+      max-height: 51px;
+      border: none;
+      outline: none;
+      margin-left: auto;
+      opacity: .5;
+      cursor: pointer;  
+    }
+
+    .delete:hover {
+      opacity: 1;
+    }
+
+    .control {
+      font-size: .88rem;
+      /* border-radius: 0 0 15px 15px; */
+      display: grid;
+      grid-template-areas:
+      'remaining clear'
+      'filter filter';
+      /* gap: 1.33rem; */
+      color: var(--active-grey);
+    }
+
+    #remaining {
+      grid-area: remaining;
+      border-radius: 0 0 0 15px;
+      cursor:default;
+    }
+
+    .filter-wrapper {
+      font-size: 1rem;
+      grid-area: filter;
+      justify-content: center;
+      margin-top: 2.33rem;
+      border-radius: 15px;
+      color: var(--active-grey);
+    }
+
+    .filter-wrapper .filter {
+      font-size: 1.125rem;
+    }
+
+    .clear-wrapper {
+      grid-area: clear;
+      justify-content: flex-end;
+      border-radius: 0 0 15px 0;
+    }
+
+    .clear {
+      font-size: .88rem;
+    }
+
+    .control button {
+      background: transparent;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      color: var(--active-grey);
+    }
+
+    .control button:hover {
+      color: var(--active-grey-hover);
+      border-bottom: 1px solid var(--active-grey);
+    }
+
+    button.blue {
+      color: var(--bright-blue);
+      border-bottom: 1px solid var(--bright-blue);
+    }
+
+    button.blue:hover {
+      color: var(--bright-blue);
+      border-bottom: 1px solid var(--bright-blue);
+    }
+
+    @media only screen and (min-width: 577px) {
+      .theme-light {
+        --background: url(./images/bg-desktop-light.jpg);
+      }
+
+      .theme-dark {
+        --background: url(./images/bg-desktop-dark.jpg);
+      }
+    }
+
+    @media only screen and (min-width: 900px) {
+      .control {
+        grid-template-areas:
+        'remaining filter clear';
+      }
+      .filter-wrapper {
+        margin: 0;
+        border-radius: 0;
+      }
+      html, #add {
+        font-size: 1.125rem;
+      }
+      main {
+        width: 73vw;
+      }
+    }
+
+    .attribution, .instructions {
+      color: var(--bottom);
+    }
+
+    .attribution { margin-top: 1rem; font-size: 11px; text-align: center;}
+    .attribution a { color: hsl(228, 45%, 44%); }
+  </style>
+</head>
+<body>
+  <div class="bg"></div>
+  <main>
+    <div class="header">
+      <h2>Todo</h2>
+      <button id="toggler" title="Switch between dark and light themes"></button>
+    </div>
+    <section class="app">
+    <div class="add-item" onclick = "document.getElementById('add').focus();">
+        <button title = "Mark all items complete" id = "all-complete" class="circle" onclick="completeAll()"></button>
+        <input id = "add" type="text" placeholder = "Create a new todo...">
+      </div>
+      <div id="items"></div>
+      <div class="control">
+        <span id = "remaining">items left</span>
+        <div class = "filter-wrapper">
+          <button id = "all" title = "Turn off filter" onclick="filterBy('all')" class="filter">All</button>
+          <button id = "active" title = "Filter by active" onclick="filterBy('active')" class="filter">Active</button>
+          <button id = "completed" title = "Filter by completed" onclick="filterBy('completed')" class="filter">Completed</button>
+        </div>
+        <div class="clear-wrapper">
+          <button title = "Clear all completed items" onclick="deleteCompleted()" class="clear">Clear completed</button>
+        </div>
+      </div>
+    </section>
+  
+    <p class="instructions">Drag and drop to reorder list</p>
+  
+    <div class="attribution">
+      Challenge by <a href="https://www.frontendmentor.io?ref=challenge" target="_blank">Frontend Mentor</a>. 
+      Coded by <a href="#">Your Name Here</a>.
+    </div>
+
+    <script>
+      var list = [];
+      var filter = (localStorage.getItem('filter') || 'all');
+      var list = (JSON.parse(localStorage.getItem('list')) || []);
+
+      function isAlphaNumeric(str) {
+        var code, i, len;
+        for (i = 0, len = str.length; i < len; i++) {
+          code = str.charCodeAt(i);
+          if (!(code > 47 && code < 58) && // numeric (0-9)
+              !(code > 64 && code < 91) && // upper alpha (A-Z)
+              !(code > 96 && code < 123) &&// lower alpha (a-z)
+              !(code == 32)) { //space
+          return false;
+          }
+        }
+        return true;
+      };
+
+      //process input upon hitting enter, adds new item
+    document.getElementById('add').onkeypress = function(e){
+      if (!e) e = window.event;
+      var keyCode = e.keyCode || e.which;
+      var circle = document.getElementById('all-complete');
+      var color = circle.style.background;
+      if (keyCode == '13'){
+        // Enter pressed
+        if (isAlphaNumeric(this.value)) {
+          var result = [];
+          result[0] = this.value;
+          result[1] = "active";
+          list.unshift(result);
+          this.value = "";
+          this.placeholder = "Success! Add another one...";
+          draw();
+          circle.style.background = "green";
+          setTimeout(function() { circle.style.background = color}, 700);
+        } else {
+          this.value = "";
+          this.placeholder = "Please only submit alphanumeric characters.";
+          circle.style.background = "yellow";
+          setTimeout(function() { circle.style.background = color}, 700);
+        }
+      }
+    }
+
+    document.getElementById('toggler').onclick = function() {
+      if (toggleTheme() === "dark") {
+        this.classList = "sun";
+      } else {
+        this.classList = "moon";
+      }
+    }
+
+    var items = document.getElementById('items');
+    var draw = function(n) {
+      // console.log(filter);
+      var rem = 0;
+      for (i = 0; i < list.length; i++) {
+        if (list[i][1] === "active") {
+          rem++;
+        }
+      }
+      document.getElementById('remaining').textContent = rem + " item(s) left";
+      var fragment = document.createDocumentFragment();
+    
+      while(items.firstChild){
+        items.removeChild(items.firstChild);
+      }
+
+      for (i = 0; i < list.length; i++) {
+        if (filter === "completed") {
+          if (list[i][1] === "active") {
+            continue;
+          }
+        } else if (filter === "active") {
+          if (list[i][1] === "completed") {
+            continue;
+          }
+        }
+        var div = document.createElement('div');
+        div.id = i;
+        div.className = "item";
+
+        if (list[i][1] === "active") {
+          div.className = "active item";
+        }
+
+        if (list[i][1] === "completed") {
+          div.className = "completed item";
+        }
+
+        div.draggable = "true";
+        div.addEventListener('dragstart', function(event) {onDragStart(event);}, false);
+        div.addEventListener('dragover', function(event) {onDragOver(event);}, false);
+        div.addEventListener('drop', function(event) {onDrop(event);}, false);
+
+        var circle = document.createElement('button');
+        circle.className = "circle";
+        circle.title = "Toggle complete";
+        circle.onclick = function(event) {
+          var id = event.target.parentElement.id;
+          toggleComplete(id);
+          }
+        div.appendChild(circle);
+
+        var span = document.createElement('span');
+        span.textContent = list[i][0];
+        span.title = "Click and drag to reorder the list";
+        div.appendChild(span);
+
+        var x = document.createElement('button');
+        x.id = "delete" + i;
+        x.title = "Delete item";
+        x.classList = "delete";
+        x.onclick = function(i) {
+          return function() {
+          deleteItem(i);
+        } }(i);
+        div.appendChild(x);
+
+        fragment.appendChild(div);
+      }
+      items.appendChild(fragment);
+      localStorage.setItem('list', JSON.stringify(list));
+    }
+
+    function deleteCompleted() {
+      for (i = 0; i < list.length; i++){
+        if (list[i][1] === "completed") {
+          list.splice(i,1);
+        }
+      }
+      draw();
+    }
+    function deleteItem(id) {
+      console.log(id);
+      list.splice(id, 1);
+      draw();
+    }
+
+    function completeAll() {
+      for (i = 0; i < list.length; i++) {
+        list[i][1] = "completed";
+      }
+      draw();
+    }
+
+    function toggleComplete(id) {
+      if (list[id][1] === "active") {
+        list[id][1] = "completed";
+      } else {
+        list[id][1] = "active";
+      }
+      draw();
+    }
+
+    function filterBy(x) {
+      var filters = document.getElementsByClassName('filter');
+      for (i = 0; i < filters.length; i++) {
+        filters[i].className = "filter";
+      }
+      document.getElementById(x).className = "blue filter";
+      localStorage.setItem('filter', x);
+      filter = x;
+      draw();
+    }
+
+    function setTheme(themeName) {
+      localStorage.setItem('theme', themeName);
+      document.documentElement.className = themeName;
+    }
+
+    function toggleTheme() {
+      if (localStorage.getItem('theme') === 'theme-dark') {
+        setTheme('theme-light');
+        return "light";
+      } else {
+        setTheme('theme-dark');
+        return "dark";
+      }
+    }
+
+    function onDragStart(e) {
+      e.dataTransfer.setData('text/plain', e.target.id);
+      console.log(e.dataTransfer.getData('text'));
+    }
+
+    function onDragOver(event) {
+      event.preventDefault();
+    }
+
+    function onDrop(event) {
+      var id = event.dataTransfer.getData('text');
+      var other = event.target.parentElement.id;
+      if (other === "items") {
+        other = event.target.id;
+      }
+      other = +other+1;
+      console.log(event.target);
+      console.log(other);
+      list.splice(other, 0, list[id]);
+      if (id > other) {
+        id = +id+1;
+      }
+      list.splice(id, 1);
+      event.dataTransfer.clearData();
+      draw();
+    }
+
+
+    //init
+    (function () {
+      if (localStorage.getItem('theme') === 'theme-dark') {
+        setTheme('theme-dark');
+      } else {
+        setTheme('theme-light');
+      }
+      filterBy(filter);
+    })();
+    </script>
+  </main>
+</body>
+</html>
