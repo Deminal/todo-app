@@ -109,7 +109,6 @@
 
     .header h2 {
       text-transform: uppercase;
-      text-justify: center;
     }
 
     button#toggler {
@@ -127,7 +126,7 @@
       opacity: 1;
     }
 
-    section.app {
+    div.app {
       width: 100%;
       flex: 1 0 80%;
       display: flex;
@@ -201,7 +200,7 @@
       margin-bottom: 2.33rem;
     }
 
-    section.app #items {
+    div.app #items {
       display: flex;
       flex-flow: column nowrap;
     }
@@ -344,10 +343,10 @@
       <h2>Todo</h2>
       <button id="toggler" title="Switch between dark and light themes"></button>
     </div>
-    <section class="app">
+    <div class="app">
     <div class="add-item" onclick = "document.getElementById('add').focus();">
         <button title = "Mark all items complete" id = "all-complete" class="circle" onclick="completeAll()"></button>
-        <input id = "add" type="text" placeholder = "Create a new todo...">
+        <input id = "add" type="text" title = "Create a new to do item" placeholder = "Create a new todo...">
       </div>
       <div id="items"></div>
       <div class="control">
@@ -361,7 +360,7 @@
           <button title = "Clear all completed items" onclick="deleteCompleted()" class="clear">Clear completed</button>
         </div>
       </div>
-    </section>
+    </div>
   
     <p class="instructions">Drag and drop to reorder list</p>
   
